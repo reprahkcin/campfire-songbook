@@ -1,23 +1,37 @@
 <template>
-  <div>
-    <h1>{{ song.title }}</h1>
-    <vue-markdown :source="song.content" />
+  <div class="song-document">
+    <div v-html="song"></div>
   </div>
 </template>
 
 <script>
-import VueMarkdown from "vue-markdown"
+import axios from "axios"
+import marked from "marked"
 
 export default {
   name: "SongDocument",
-  components: {
-    VueMarkdown
+  props: ["file"],
+  data() {
+    return {
+      song: ""
+    }
   },
-  props: {
-    song: {
-      type: Object,
-      required: true
+  created() {
+    this.loadSong()
+  },
+  methods: {
+    async loadSong() {
+      const response = await axios.get(this.file)
+      const markdown = response.data
+      const html = marked(markdown)
+      this.song = html
     }
   }
 }
 </script>
+
+<style scoped>
+.song-document {
+  padding: 1rem;
+}
+</style>
